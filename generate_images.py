@@ -42,7 +42,7 @@ def get_google_font_list():
 
 def main():
     # settings
-    n_samples = 1  # per combination of font and letter
+    n_samples = 8  # per combination of font and letter
     fonts = get_google_font_list()
     letters = [*ascii_letters, 'ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü', 'ß']
     print(f'Will generate {n_samples * len(fonts) * len(letters)} images in total.')
