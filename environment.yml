@@ -1,0 +1,11 @@
+name: letterimages
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.8
+  - numpy
+  - tqdm
+  - pillow
+  - pandas
+  - gitpython
+  - protobuf
