@@ -41,6 +41,8 @@ def get_google_font_list():
     return fonts_df.ttf_path.tolist()
 
 def main():
+    np.random.seed(25102025)
+
     # settings
     n_samples = 8  # per combination of font and letter
     fonts = get_google_font_list()
