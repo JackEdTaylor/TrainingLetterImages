@@ -11,10 +11,9 @@ def get_letter_dims(letter, font_file='arial.ttf', font_size=128, rotation=0.0):
     # takes the bbox, and then calculates what the height and width will be after rotation
     font = ImageFont.truetype(font_file, font_size)
     _, _, w, h = font.getbbox(letter, anchor='lt')
-    W = w * np.abs(np.cos(rotation)) + h * np.abs(np.sin(rotation))
-    H = w * np.abs(np.sin(rotation)) + h * np.abs(np.cos(rotation))
-    dims = (W, H)
-    return dims
+    W = w * np.abs(np.sin(rotation)) + h * np.abs(np.cos(rotation))
+    H = w * np.abs(np.cos(rotation)) + h * np.abs(np.sin(rotation))
+    return W, H
 
 def render_text_im(letter, font_file='arial.ttf', x=128, y=128, font_size=128, rotation=0.0, canvas_dims=(256, 256), variation='Regular'):
     font = ImageFont.truetype(font_file, font_size)
