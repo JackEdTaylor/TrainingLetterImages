@@ -15,7 +15,7 @@ def get_letter_dims(letter, font_file='arial.ttf', font_size=128, rotation=0.0):
     H = w * np.abs(np.cos(rotation)) + h * np.abs(np.sin(rotation))
     return W, H
 
-def render_text_im(letter, font_file='arial.ttf', x=128, y=128, font_size=128, rotation=0.0, canvas_dims=(256, 256), variation='Regular'):
+def render_text_im(letter, font_file='arial.ttf', x=128, y=128, font_size=128, rotation=0.0, canvas_dims=(256, 256), variation='Regular', draw_bounds=False):
     font = ImageFont.truetype(font_file, font_size)
 
     # if a variation is requested, try to set to the requested variation
@@ -33,6 +33,11 @@ def render_text_im(letter, font_file='arial.ttf', x=128, y=128, font_size=128, r
     draw = ImageDraw.Draw(im)
     draw.text((x, y), letter, fill=255, font=font, anchor='mm')
     im   = im.rotate(rotation, center=(x, y))  # rotate using the text location as the centre of rotation
+
+    if draw_bounds:
+        W, H = get_letter_dims(letter=letter, font_file=font_file, font_size=font_size, rotation=rotation)
+        draw = ImageDraw.Draw(im)
+        draw.rectangle(xy=[(x-W/2, y-H/2), (x+W/2, y+H/2)], outline=255, width=5)
     return im
 
 def get_google_font_list():
