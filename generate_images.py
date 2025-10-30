@@ -75,7 +75,7 @@ def main():
                                     for S, R in zip(size_vals, rotation_vals)])
 
             if np.any(letter_dims[:, 0]>canvas_dims[0]) or np.any(letter_dims[:, 1]>canvas_dims[1]):
-                warnings.warn('Letter size exceeds canvas dimensions!')
+                warnings.warn(f'Letter {L} in font {Path(F).stem} exceeds canvas dimensions!')
 
             # set the bounds for x and y location so that the letters don't exceed the canvas
             # (depends on size and rotation values)
