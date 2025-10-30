@@ -55,7 +55,7 @@ def main():
 
     canvas_dims = (256, 256)
     rotation_bounds = (-15, 15)
-    size_bounds = (12, 0.5*max(canvas_dims))
+    size_bounds = (16, 0.5*max(canvas_dims))
     decimals = 3  # number of decimals to round all variables to
     ims_path = Path('ims')
 
