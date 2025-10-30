@@ -69,12 +69,6 @@ def font_succeeds(char_list, font='arial.ttf', font_size=50, canvas_dims=(100, 1
         if np.max(unique_counts) > max_identical:
             return False
 
-        # is it within the maximum dimensions?
-        dims_exceeded = [(x_i.shape[0]>max_dims[0]) | (x_i.shape[1]>max_dims[1]) for x_i in x_arrs]
-
-        if any(dims_exceeded):
-            return False
-
         # does it produce real values?
         if not all([np.all(np.isreal(x_i)) for x_i in x_arrs]):
             return False
@@ -86,6 +80,7 @@ def font_succeeds(char_list, font='arial.ttf', font_size=50, canvas_dims=(100, 1
         return True
     except:
         # if it fails to draw or be manipulated as a numpy array
+        # (includes exceeding canvas dimensions in render_text_im)
         return False
 
 # function to get a dataframe with all font info for all suitable fonts
