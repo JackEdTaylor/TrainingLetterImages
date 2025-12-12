@@ -133,7 +133,7 @@ def main():
     canvas_dims = (256, 256)
     rotation_bounds = (-15, 15)
     min_font_size = 16
-    size_bounds = (min_font_size, 0.4*canvas_dims[1])
+    size_bounds = (min_font_size, 0.45*canvas_dims[1])
     decimals = 3  # number of decimals to round all variables to
     ims_path = Path('ims')
 
