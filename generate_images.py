@@ -73,7 +73,7 @@ def render_text_im(letter, font_file='arial.ttf', x=128, y=128, font_size=128, r
     tl, tr, br, bl = rotate_bbox_to_vertices(text_bbox, rotation=rotation)
     verts_array = np.round([tl, tr, br, bl])
     if np.any(verts_array<0) or np.any(verts_array[0, :]>(canvas_dims[0]-1)) or np.any(verts_array[1, :]>(canvas_dims[1]-1)):
-        raise ValueError(f'Canvas dimensions exceeded! {tl, tr, br, bl}')
+        raise ValueError(f'Canvas dimensions exceeded! {tl, tr, br, bl}, {letter, font_file, font_size, x, y, rotation}')
 
     if draw_bounds:
         draw = ImageDraw.Draw(im)
@@ -83,6 +83,43 @@ def render_text_im(letter, font_file='arial.ttf', x=128, y=128, font_size=128, r
 def get_google_font_list():
     fonts_df = pd.read_csv(Path('freqs') / 'font_frequencies.csv')
     return fonts_df.ttf_path.tolist()
+
+def get_letter_wh(letter, font_file='arial.ttf', font_size=128, rotation=0.0, variation='Regular'):
+    letter_verts = np.array( get_letter_vertices(letter, font_file=font_file, font_size=font_size, rotation=rotation, variation=variation) )
+    min_x = letter_verts[:, 0].min()
+    max_x = letter_verts[:, 0].max()
+    min_y = letter_verts[:, 1].min()
+    max_y = letter_verts[:, 1].max()
+    w = max_x - min_x
+    h = max_y - min_y
+    return (w, h)
+
+def get_max_font_size(letter, canvas_dims, font_file='arial.ttf', variation='Regular'):
+    # calculate the maximum font size possible for this letter in this font without exceeding the canvas dimensions
+    # first, get the width and height
+    base_size = min(canvas_dims)
+    w, h = get_letter_wh(letter=letter, font_file=font_file, font_size=base_size, rotation=0.0, variation=variation)
+    # calculate the rotation that would result in this letter having the maximum w
+    rot_max_x = -np.atan(np.round(h)/np.round(w)) * (180/np.pi)
+    # use this rotation to calculate the corresponding w and h
+    max_w, max_h = get_letter_wh(letter=letter, font_file=font_file, font_size=base_size, rotation=rot_max_x, variation=variation)
+    # now, calculate the max proportion of the base_size that would keep the w and h smaller than the canvas dims
+    max_dim = max((max_w, max_h))
+    est_max_font_size = base_size / max_dim * base_size
+
+    # use this as a starting point and then search around this number to get the actual max font size
+    test_sizes = np.arange(est_max_font_size-20, est_max_font_size+21, step=1)
+    dims = np.array([get_letter_wh(letter=letter, font_file=font_file, font_size=S, rotation=rot_max_x, variation=variation) for S in test_sizes])
+
+    # remove sizes too large
+    poss_idx = (dims[:, 0]<canvas_dims[0]) & (dims[:, 1]<canvas_dims[1])
+    assert np.mean(poss_idx)>0 and np.mean(poss_idx<1), 'Check est_max_font_size'
+    poss_sizes = test_sizes[poss_idx]
+
+    # get the max font size that didn't exceed the canvas
+    max_font_size = np.floor(np.max(poss_sizes))
+
+    return max_font_size
 
 def main():
     np.random.seed(25102025)
@@ -95,7 +132,8 @@ def main():
 
     canvas_dims = (256, 256)
     rotation_bounds = (-15, 15)
-    size_bounds = (16, 0.5*max(canvas_dims))
+    min_font_size = 16
+    size_bounds = (min_font_size, 0.4*canvas_dims[1])
     decimals = 3  # number of decimals to round all variables to
     ims_path = Path('ims')
 
@@ -111,6 +149,10 @@ def main():
         save_dir.mkdir(parents=True, exist_ok=True)
 
         for F in fonts:
+            # # possible approach to calculate max font size for each font-letter combination separately
+            # max_font_size = get_max_font_size(letter=L, canvas_dims=canvas_dims, font_file=F)
+            # size_bounds = (min_font_size, max_font_size)
+
             rotation_vals = np.random.uniform(low=rotation_bounds[0], high=rotation_bounds[1], size=n_samples).round(decimals)
             size_vals = np.random.uniform(low=size_bounds[0], high=size_bounds[1], size=n_samples).round(decimals)
 
